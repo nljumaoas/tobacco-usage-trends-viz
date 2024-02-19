@@ -68,6 +68,14 @@
             (a, b) => a !== b
         ); 
 
+        // Update country names in your dataset
+        const renameMap = rename();
+        tobacco.forEach(d => {
+            if (renameMap.has(d.Location)) {
+                d.Location = renameMap.get(d.Location); // Replace with the name from the map
+            }
+        });
+
         // creates SVG with specified characteristics
         const width = 1000;
         const marginTop = 46;
@@ -168,7 +176,7 @@
             legend.append("g")
                 .attr("transform", `translate(0, ${legendHeight})`)
                 .call(d3.axisBottom(legendScale).ticks(6));
-
+            
             // Append legend title
             legend.append("text")
                 .attr("class", "legend-title")
@@ -177,8 +185,8 @@
                 .text("Estimate of Current Tobacco Use Prevalence in " + sex + "(%) (Age-standardized Rate)");
         };
 
-        // FINALLY GUYS
-        populate_color(tobacco, 'Female', 2007);
+        // use this function to update color
+        populate_color(tobacco, 'Both sexes', 2007);
 
         
     });
