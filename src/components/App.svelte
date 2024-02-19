@@ -128,10 +128,52 @@
                 .attr("fill", "none")
                 .attr("stroke", "white")
                 .attr("d", path);
+
+            const legendWidth = 300, legendHeight = 20, legendMargin = {top: 10, right: 60, bottom: 40, left: 60};
+
+            // Create a sequential color scale (if different, adjust as needed)
+            const colorScale = d3.scaleSequential(d3.extent(tobacco.map(d => +d.FactValueNumeric)), d3.interpolateYlGnBu);
+
+            // Define the legend scale
+            const legendScale = d3.scaleLinear()
+                .domain(d3.extent(tobacco.map(d => +d.FactValueNumeric)))
+                .range([0, legendWidth]);
+
+            // Append a legend group to the SVG
+            const legend = svg.append("g")
+                .attr("transform", `translate(${width - legendWidth - legendMargin.right},${height - legendMargin.bottom})`);
+
+            // Append gradient bar for the legend
+            const linearGradient = legend.append("defs")
+                .append("linearGradient")
+                .attr("id", "gradient")
+                .attr("x1", "0%")
+                .attr("x2", "100%")
+                .attr("y1", "0%")
+                .attr("y2", "0%");
+
+            colorScale.ticks().forEach(function(tick, i, ticks) {
+                linearGradient.append("stop")
+                    .attr("offset", `${100 * i / ticks.length}%`)
+                    .attr("stop-color", colorScale(tick));
+            });
+
+            // Append color bar
+            legend.append("rect")
+                .attr("width", legendWidth)
+                .attr("height", legendHeight)
+                .style("fill", "url(#gradient)");
+
+            // Append legend axis
+            legend.append("g")
+                .attr("transform", `translate(0, ${legendHeight})`)
+                .call(d3.axisBottom(legendScale).ticks(6));
         };
 
         // FINALLY GUYS
         populate_color(tobacco, 'Female', 2007);
+
+        
     });
 
 </script>
