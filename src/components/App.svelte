@@ -64,7 +64,7 @@
     const g = svg.append("g");
 
     // reads in the WHO tobacco dataset
-    d3.csv("src/routes/tobacco_trends.csv").then((tobacco) => {
+    d3.csv("src/components/tobacco_trends.csv").then((tobacco) => {
         // this is probably where the filters can be changed based on user input, currently arbitrary placeholders
         tobacco = tobacco.filter(
         (entry) => entry.Dim1ValueCode == "SEX_BTSX" && entry.Period == 2007
@@ -81,7 +81,7 @@
         console.log(valuemap);
 
         // reads in the topojson data
-        d3.json("src/routes/world.json").then((topojsonData) => {
+        d3.json("src/components/world.json").then((topojsonData) => {
         const countries = topojson.feature(
             topojsonData,
             topojsonData.objects.countries
