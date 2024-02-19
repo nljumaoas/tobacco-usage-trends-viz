@@ -1,6 +1,10 @@
 <script>
     import * as d3 from "d3";
     import * as topojson from "topojson";
+    import { onMount } from 'svelte';
+
+    
+
 
     // renames countries to make sure names are consistent for mapping
     function rename() {
@@ -36,100 +40,100 @@
         ]);
     }
 
-    // Check if running in a browser environment
-    if (typeof document !== "undefined") {
-    // creates SVG with specified characteristics
-    const width = 1000;
-    const marginTop = 46;
-    const height = width / 2 + marginTop;
+    // stores all data here
+    //tobacco
+    let tobacco = [];
 
-    const svg = d3
-        .select("body")
-        .append("svg")
-        .attr("width", width)
-        .attr("height", height);
+    //topojson
+    let countries = [];
+    let countrymesh = [];
 
-    // creates base map
-    const projection = d3.geoEqualEarth();
-    const path = d3.geoPath(projection);
-
-    // creates map border
-    svg
-        .append("path")
-        .datum({ type: "Sphere" })
-        .attr("fill", "white")
-        .attr("stroke", "currentColor")
-        .attr("d", path);
-
-    const g = svg.append("g");
-
-    // reads in the WHO tobacco dataset
-    d3.csv("src/components/tobacco_trends.csv").then((tobacco) => {
-        // this is probably where the filters can be changed based on user input, currently arbitrary placeholders
-        tobacco = tobacco.filter(
-        (entry) => entry.Dim1ValueCode == "SEX_BTSX" && entry.Period == 2007
-        );
+    onMount(async () => {
+        // read in tobacco_trends
+        const res1 = await fetch('tobacco_trends.csv'); 
+        const csv = await res1.text();
+        tobacco = d3.csvParse(csv, d3.autoType)
         console.log(tobacco);
 
-        const valuemap = new Map(
-        tobacco.map((d) => [d.Location, +d.FactValueNumeric])
+        // read in topojson
+        const res2 = await fetch('world.json');
+        const data = await res2.json();
+        countries = topojson.feature(
+            data,
+            data.objects.countries
         );
-        const color = d3.scaleSequential(
-        d3.extent(valuemap.values()),
-        d3.interpolateYlGnBu
-        );
-        console.log(valuemap);
-
-        // reads in the topojson data
-        d3.json("src/components/world.json").then((topojsonData) => {
-        const countries = topojson.feature(
-            topojsonData,
-            topojsonData.objects.countries
-        );
-        const countrymesh = topojson.mesh(
-            topojsonData,
-            topojsonData.objects.countries,
+        countrymesh = topojson.mesh(
+            data,
+            data.objects.countries,
             (a, b) => a !== b
-        );
+        ); 
 
-        // assigns colors to countries based on FactValueNumeric data
-        g.selectAll("path")
-            .data(countries.features)
-            .join("path")
-            .attr("fill", (d) => color(valuemap.get(d.properties.name)))
-            .attr("d", path)
-            // creates basic tooltip, should be pretty customizable
-            .append("title")
-            .text(
-            (d) => `${d.properties.name}\n${valuemap.get(d.properties.name)}`
-            );
+        // creates SVG with specified characteristics
+        const width = 1000;
+        const marginTop = 46;
+        const height = width / 2 + marginTop;
 
-        // adds a white border between countries for *aesthetics*
+        const svg = d3
+            .select("body")
+            .append("svg")
+            .attr("width", width)
+            .attr("height", height);
+
+        // creates base map
+        const projection = d3.geoEqualEarth();
+        const path = d3.geoPath(projection);
+
+        // creates map border
         svg
             .append("path")
-            .datum(countrymesh)
-            .attr("fill", "none")
-            .attr("stroke", "white")
+            .datum({ type: "Sphere" })
+            .attr("fill", "white")
+            .attr("stroke", "currentColor")
             .attr("d", path);
-        });
+
+        const g = svg.append("g");
+
+        function populate_color(dataset, sex, year){
+            console.log(dataset);
+            const filtered = dataset.filter(
+            (entry) => entry.Dim1 == sex && entry.Period == year
+            );
+            console.log(filtered);
+
+            const valuemap = new Map(
+                filtered.map((d) => [d.Location, +d.FactValueNumeric])
+            );
+            const color = d3.scaleSequential(
+                d3.extent(valuemap.values()),
+                d3.interpolateYlGnBu
+            );
+            console.log(valuemap);
+
+            // assigns colors to countries based on FactValueNumeric data
+            g.selectAll("path")
+                    .data(countries.features)
+                    .join("path")
+                    .attr("fill", (d) => color(valuemap.get(d.properties.name)))
+                    .attr("d", path)
+                    // creates basic tooltip, should be pretty customizable
+                    .append("title")
+                    .text(
+                    (d) => `${d.properties.name}\n${valuemap.get(d.properties.name)}`
+                    );
+
+            // adds a white border between countries for *aesthetics*
+            svg
+                .append("path")
+                .datum(countrymesh)
+                .attr("fill", "none")
+                .attr("stroke", "white")
+                .attr("d", path);
+        };
+
+        // FINALLY GUYS
+        populate_color(tobacco, 'Female', 2007);
     });
-    }
 
-    function updateMap(selectedYear) {
-    // Filter tobacco data for the selected year
-    const filteredData = tobaccoData.filter((d) => d.year === selectedYear);
-    const valuemap = new Map(
-        filteredData.map((d) => [d.Location, +d.FactValueNumeric])
-    );
-
-    // Update country colors based on new valuemap
-    g.selectAll("path")
-        .data(countries.features)
-        .join("path")
-        .attr("fill", (d) =>
-        color(valuemap.get(d.properties.name) || "defaultColor")
-        ); // Use a default color if data is missing
-    }
 </script>
 
 <main>
