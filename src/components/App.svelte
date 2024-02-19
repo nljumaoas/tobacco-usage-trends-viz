@@ -168,6 +168,13 @@
             legend.append("g")
                 .attr("transform", `translate(0, ${legendHeight})`)
                 .call(d3.axisBottom(legendScale).ticks(6));
+
+            // Append legend title
+            legend.append("text")
+                .attr("class", "legend-title")
+                .attr("x", -240) // X coordinate of the legend title; adjust as needed
+                .attr("y", -5) // Y coordinate of the legend title; adjust as needed
+                .text("Estimate of Current Tobacco Use Prevalence in " + sex + "(%) (Age-standardized Rate)");
         };
 
         // FINALLY GUYS
