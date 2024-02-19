@@ -133,7 +133,12 @@
                         return defaultColor; // Use the default color for countries not in the dataset
                     }
                 })
-                .attr("d", path);
+                .attr("d", path)
+                // tooltip
+                .append("title")
+                .text(
+                (d) => `${d.properties.name}\n${valuemap.get(d.properties.name)}%`
+                );
 
             // adds a white border between countries for *aesthetics*
             svg
@@ -155,6 +160,7 @@
 
             // Append a legend group to the SVG
             const legend = svg.append("g")
+                .attr("class", "map-legend")
                 .attr("transform", `translate(${width - legendWidth - legendMargin.right},${height - legendMargin.bottom})`);
 
             // Append gradient bar for the legend
@@ -186,19 +192,38 @@
             // Append legend title
             legend.append("text")
                 .attr("class", "legend-title")
-                .attr("x", -240) // X coordinate of the legend title; adjust as needed
+                .attr("x", -245) // X coordinate of the legend title; adjust as needed
                 .attr("y", -5) // Y coordinate of the legend title; adjust as needed
-                .text("Estimate of Current Tobacco Use Prevalence in " + sex + "(%) (Age-standardized Rate)");
+                .text("Estimate of Year " + year + " Tobacco Use Prevalence in " + sex + " (%) (Age-standardized Rate)");
         };
 
         // use this function to update color
-        populate_color(tobacco, 'Both sexes', 2007);
+        let sex = 'Both sexes';
+        let year = 2007;
+        populate_color(tobacco, sex, year);
 
+        const selectElement = document.getElementById('genderSelect');
+        selectElement.addEventListener('change', (event) => {
+            // get selection from menu
+            sex = event.target.value;
+            // clear out all element before updating
+            g.selectAll("path").remove([d3.text, d3.fill]);
+            svg.selectAll(".map-legend").remove();
+            // Update the map based on the selected gender
+            populate_color(tobacco, sex, year); 
+        });
         
     });
 
 </script>
 
 <main>
-    
+    <div class="dropdown-container">
+        <label for="genderSelect">Select Gender: </label>
+        <select id="genderSelect">
+            <option value="Both sexes">Both sexes</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+        </select>
+    </div>
 </main>
