@@ -118,16 +118,22 @@
             console.log(valuemap);
 
             // assigns colors to countries based on FactValueNumeric data
+            const defaultColor = "#cccccc";
             g.selectAll("path")
-                    .data(countries.features)
-                    .join("path")
-                    .attr("fill", (d) => color(valuemap.get(d.properties.name)))
-                    .attr("d", path)
-                    // creates basic tooltip, should be pretty customizable
-                    .append("title")
-                    .text(
-                    (d) => `${d.properties.name}\n${valuemap.get(d.properties.name)}`
-                    );
+                .data(countries.features)
+                .join("path")
+                .attr("fill", d => {
+                    const countryName = d.properties.name; // Get the country name from the GeoJSON feature
+                    const dataValue = valuemap.get(countryName); // Attempt to get the data value for this country
+
+                    // Check if the country was found in the dataset and has a valid data value
+                    if (dataValue !== undefined) {
+                        return color(dataValue); // Use the data value to determine the color
+                    } else {
+                        return defaultColor; // Use the default color for countries not in the dataset
+                    }
+                })
+                .attr("d", path);
 
             // adds a white border between countries for *aesthetics*
             svg
