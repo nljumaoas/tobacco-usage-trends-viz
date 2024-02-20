@@ -101,6 +101,12 @@
 
         const g = svg.append("g");
 
+        // creates color code for our map
+        const globalValueExtent = d3.extent(tobacco, d => d.FactValueNumeric);
+        // Define a global color scale
+        const globalColorScale = d3.scaleSequential(globalValueExtent, d3.interpolateYlGnBu);
+        const defaultColor = "#cccccc";
+
         function populate_color(dataset, sex, year){
             console.log(dataset);
             const filtered = dataset.filter(
@@ -111,14 +117,11 @@
             const valuemap = new Map(
                 filtered.map((d) => [d.Location, +d.FactValueNumeric])
             );
-            const color = d3.scaleSequential(
-                d3.extent(valuemap.values()),
-                d3.interpolateYlGnBu
-            );
+
             console.log(valuemap);
 
             // assigns colors to countries based on FactValueNumeric data
-            const defaultColor = "#cccccc";
+            
             g.selectAll("path")
                 .data(countries.features)
                 .join("path")
@@ -128,7 +131,7 @@
 
                     // Check if the country was found in the dataset and has a valid data value
                     if (dataValue !== undefined) {
-                        return color(dataValue); // Use the data value to determine the color
+                        return globalColorScale(dataValue); // Use the data value to determine the color
                     } else {
                         return defaultColor; // Use the default color for countries not in the dataset
                     }
@@ -200,35 +203,36 @@
         
 
         // use this function to update color
-        let sex = 'Both sexes';
-        let year = 2007;
+        let selectedSex = 'Both sexes';
+        let selectedYear = 2007;
         
-        populate_color(tobacco, sex, year);
+        populate_color(tobacco, selectedSex, selectedYear);
 
         const selectElement = document.getElementById('genderSelect');
         selectElement.addEventListener('change', (event) => {
             // get selection from menu
-            sex = event.target.value;
+            selectedSex = event.target.value;
             // clear out all element before updating
             g.selectAll("path").remove([d3.text, d3.fill]);
             svg.selectAll(".map-legend").remove();
             // Update the map based on the selected gender
-            populate_color(tobacco, sex, year); 
+            populate_color(tobacco, selectedSex, selectedYear); 
         });
 
         const yearSlider = document.getElementById('yearSlider');
         const yearValueDisplay = document.getElementById('yearValue');
 
         yearSlider.addEventListener('input', (event) => {
-            const selectedYear = event.target.value;
+            const years = [2000, 2005, 2007, 2010, 2015, 2020, 2021, 2022, 2025, 2030]; 
+            selectedYear = years[event.target.value];
             yearValueDisplay.textContent = selectedYear; // Update the display next to the slider
 
             // Clear the existing map visualization
-            g.selectAll("path").remove();
+            g.selectAll("path").remove([d3.text, d3.fill]);
             svg.selectAll(".map-legend").remove();
 
             // Update the map visualization based on the new year
-            populate_color(tobacco, sex, selectedYear);
+            populate_color(tobacco, selectedSex, selectedYear);
         });
         
     });
@@ -247,7 +251,7 @@
 
     <div class="slider-container">
         <label for="yearSlider">Select Year: </label>
-        <input type="range" id="yearSlider" min="2000" max="2020" value="2007" step="1">
+        <input type="range" id="yearSlider" min="0" max="9" value="2" step="1">
         <span id="yearValue">2007</span>
     </div>
 
