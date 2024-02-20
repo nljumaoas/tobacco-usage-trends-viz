@@ -197,9 +197,12 @@
                 .text("Estimate of Year " + year + " Tobacco Use Prevalence in " + sex + " (%) (Age-standardized Rate)");
         };
 
+        
+
         // use this function to update color
         let sex = 'Both sexes';
         let year = 2007;
+        
         populate_color(tobacco, sex, year);
 
         const selectElement = document.getElementById('genderSelect');
@@ -211,6 +214,21 @@
             svg.selectAll(".map-legend").remove();
             // Update the map based on the selected gender
             populate_color(tobacco, sex, year); 
+        });
+
+        const yearSlider = document.getElementById('yearSlider');
+        const yearValueDisplay = document.getElementById('yearValue');
+
+        yearSlider.addEventListener('input', (event) => {
+            const selectedYear = event.target.value;
+            yearValueDisplay.textContent = selectedYear; // Update the display next to the slider
+
+            // Clear the existing map visualization
+            g.selectAll("path").remove();
+            svg.selectAll(".map-legend").remove();
+
+            // Update the map visualization based on the new year
+            populate_color(tobacco, sex, selectedYear);
         });
         
     });
@@ -226,4 +244,11 @@
             <option value="Female">Female</option>
         </select>
     </div>
+
+    <div class="slider-container">
+        <label for="yearSlider">Select Year: </label>
+        <input type="range" id="yearSlider" min="2000" max="2020" value="2007" step="1">
+        <span id="yearValue">2007</span>
+    </div>
+
 </main>
