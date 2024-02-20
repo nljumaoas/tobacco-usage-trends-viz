@@ -82,7 +82,7 @@
         const height = width / 2 + marginTop;
 
         const svg = d3
-            .select("body")
+            .select(".graph-container")
             .append("svg")
             .attr("width", width)
             .attr("height", height);
@@ -110,7 +110,7 @@
         function populate_color(dataset, sex, year){
             console.log(dataset);
             const filtered = dataset.filter(
-            (entry) => entry.Dim1 == sex && entry.Period == year
+            (entry) => entry.Dim1 == sex && entry.Period == year && entry.Indicator == 'Estimate of current tobacco use prevalence (%) (age-standardized rate)'
             );
             console.log(filtered);
 
@@ -139,9 +139,12 @@
                 .attr("d", path)
                 // tooltip
                 .append("title")
-                .text(
-                (d) => `${d.properties.name}\n${valuemap.get(d.properties.name)}%`
-                );
+                .text(d => {
+                    const countryName = d.properties.name;
+                    const dataValue = valuemap.get(countryName); // Get the data value for this country
+                    // Check if the country was found in the dataset and has a valid data value
+                    return dataValue !== undefined ? `${countryName}\n${dataValue}%` : `${countryName}\nNo Data`;
+                });
 
             // adds a white border between countries for *aesthetics*
             svg
@@ -195,8 +198,9 @@
             // Append legend title
             legend.append("text")
                 .attr("class", "legend-title")
-                .attr("x", -245) // X coordinate of the legend title; adjust as needed
-                .attr("y", -5) // Y coordinate of the legend title; adjust as needed
+                .attr("x", 300)
+                .attr("y", -5)
+                .attr("text-anchor", "end")
                 .text("Estimate of Year " + year + " Tobacco Use Prevalence in " + sex + " (%) (Age-standardized Rate)");
         };
 
@@ -207,7 +211,6 @@
         let selectedYear = 2007;
         
         populate_color(tobacco, selectedSex, selectedYear);
-
         const selectElement = document.getElementById('genderSelect');
         selectElement.addEventListener('change', (event) => {
             // get selection from menu
@@ -240,19 +243,39 @@
 </script>
 
 <main>
-    <div class="dropdown-container">
-        <label for="genderSelect">Select Gender: </label>
-        <select id="genderSelect">
-            <option value="Both sexes">Both sexes</option>
-            <option value="Male">Male</option>
-            <option value="Female">Female</option>
-        </select>
+    <div class="graph-container">
+        <style>
+            .graph-container {
+                position: relative; 
+                height: 100%; 
+            }
+        
+            .controls-container {
+                position: relative; 
+                bottom: 63px; 
+                left: 0; 
+                padding: 0px; 
+            }
+        
+            .dropdown-container, .slider-container {
+                margin-bottom: 10px; 
+            }
+        </style>
     </div>
+    <div class="controls-container">
+        <div class="slider-container">
+            <label for="yearSlider">Select Year: </label>
+            <input type="range" id="yearSlider" min="0" max="9" value="2" step="1">
+            <span id="yearValue">2007</span>
+        </div>
 
-    <div class="slider-container">
-        <label for="yearSlider">Select Year: </label>
-        <input type="range" id="yearSlider" min="0" max="9" value="2" step="1">
-        <span id="yearValue">2007</span>
+        <div class="dropdown-container">
+            <label for="genderSelect">Select Gender: </label>
+            <select id="genderSelect">
+                <option value="Both sexes">Both sexes</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+            </select>
+        </div>
     </div>
-
 </main>
