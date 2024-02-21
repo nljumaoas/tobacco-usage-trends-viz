@@ -208,7 +208,7 @@
 
         // use this function to update color
         let selectedSex = 'Both sexes';
-        let selectedYear = 2007;
+        let selectedYear = 2000;
         
         populate_color(tobacco, selectedSex, selectedYear);
         const selectElement = document.getElementById('genderSelect');
@@ -269,8 +269,8 @@
     <div class="controls-container">
         <div class="slider-container">
             <label for="yearSlider">Select Year: </label>
-            <input type="range" id="yearSlider" min="0" max="9" value="2" step="1">
-            <span id="yearValue">2007</span>
+            <input type="range" id="yearSlider" min="0" max="9" value="0" step="1">
+            <span id="yearValue">2000</span>
         </div>
 
         <div class="dropdown-container">
