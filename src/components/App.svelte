@@ -243,6 +243,10 @@
 </script>
 
 <main>
+    <article id="title">
+        <h1 style="font-size: 24px; font-weight: bold; color: #333; margin-bottom: 5px; margin-left: 220px;">
+            World-Wide Tobacco Usage Per Gender Over Time</h1>
+    </article>
     <div class="graph-container">
         <style>
             .graph-container {
