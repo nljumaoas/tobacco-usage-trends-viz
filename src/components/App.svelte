@@ -238,6 +238,22 @@
             populate_color(tobacco, selectedSex, selectedYear);
         });
         
+
+        // add collapsible for our team writeup
+        var coll = document.getElementsByClassName("collapsible");
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+        coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            var content = this.nextElementSibling;
+            if (content.style.display === "block") {
+            content.style.display = "none";
+            } else {
+            content.style.display = "block";
+            }
+        });
+        }
     });
 
 </script>
@@ -282,4 +298,65 @@
             </select>
         </div>
     </div>
+    <button type="button" class="collapsible">Team Writeup (Click to open)</button>
+        <div class="content">
+        <p>
+            <p>
+                <strong>DSC106 Project 3 Writeup</strong>
+              </p>
+              <p>Group members: Nicholas Jumaoas, Jiaqing Yan, Yosen Lin</p>
+              <p>After deciding to use Jiaqing’s WHO tobacco usage dataset for our visualization, we very quickly settled on using a choropleth map as the base structure for our visualization since it allows differences in geographic distributions to be conveyed directly and evocatively. Building off of that, we took inspiration from examples from the labs and the D3 website and decided to implement filters for gender and time, as well as adding a hover-based tooltip that displays country name and its percentage of tobacco usage. While a dropdown menu felt like the most intuitive interaction technique for the gender display, we chose a slider over the dropdown menu showcased on the WHO website for the time slider because it allows the viewer to more seamlessly experience how the distribution of tobacco usage has changed over time.</p>
+              <p>Our development process consisted of data cleaning, the construction of the base choropleth, and then the implementation of the tooltip as well as gender and time series filters and their corresponding interactive elements. After considering scheduling limitations of group members, the work was assigned as follows:</p>
+              <div>
+                <table>
+                  <tbody>
+                    <tr>
+                      <td>
+                        <strong>Name&nbsp;&nbsp;</strong>
+                      </td>
+                      <td>
+                        <strong>&nbsp; Responsibilities</strong>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td>Nicholas</td>
+                      <td>&nbsp; Base choropleth, tooltip, writeup</td>
+                    </tr>
+                    <tr>
+                      <td>Jiaqing</td>
+                      <td>&nbsp; Gender filter, data cleaning, gender dropdown menu, writeup collapsible</td>
+                    </tr>
+                    <tr>
+                      <td>Yosen</td>
+                      <td>&nbsp; Time series filter, year slider</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <p>Including both development of the visualization itself as well as external work such as the data cleaning and writeup, our group spent approximately 22 hours working on this project, encountering various obstacles ranging from missing data to messy file structures. In particular, the missing data caused various iterations of the slider implementation to be plagued by bugs. We fixed it by making the slider more discrete. Additionally, there were general struggles involving straightening out the logic behind the interactive graph itself as well as the JavaScript/Svelte code behind it.</p>
+        </div>
+        <style>
+            .collapsible {
+            background-color: #eee;
+            color: #444;
+            cursor: pointer;
+            padding: 18px;
+            width: 100%;
+            border: none;
+            text-align: left;
+            outline: none;
+            font-size: 15px;
+            }
+
+            .active, .collapsible:hover {
+            background-color: #ccc;
+            }
+
+            .content {
+            padding: 0 18px;
+            display: none;
+            overflow: hidden;
+            background-color: #f1f1f1;
+            }
+        </style>
 </main>
